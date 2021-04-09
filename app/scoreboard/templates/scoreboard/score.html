@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{match}}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+{% load mathfilters %}
+<div class="jumbotron">
+  <h1 class="display-6">{{match}}</h1>
+  <div class="row">
+      {% for inning in innings %}
+        <div class="col-6">
+            <div class="card" style="width: 100%;">
+              <div class="card-body">
+                <h5 class="card-title">{{inning.innings.team}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Innings - {{inning.innings.innings_number}}</h6>
+                <h3 class="card-text">{{inning.total}}</h3>
+                <a href="#" class="card-link">Scorecard</a>
+              </div>
+            </div>
+        </div>
+      {% endfor %}
+  </div>
+</div>
+
+<div class="container">
+    {% for inning in innings %}
+        <div class="card" style="margin-bottom:10px;">
+            <div class="card-body">
+                <div class="card-title">
+                    <h3>Commentry - {{inning.innings.team}}</h3>
+                </div>
+                    <div class="list-group">
+                        {% for runs in inning.runs %}
+                            <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6>
+                                        {% if runs.action|lower == 'wicket' %}
+                                            <span class="badge badge-danger">
+                                                W
+                                            </span>&nbsp;
+                                        {% elif runs.runs == '6' %}
+                                            <span class="badge badge-warning">
+                                                {{runs.runs}}
+                                            </span>&nbsp;
+                                        {% elif runs.runs == '4' %}
+                                            <span class="badge badge-success">
+                                                {{runs.runs}}
+                                            </span>&nbsp;
+                                        {% else %}
+                                            <span class="badge badge-primary">
+                                                {{runs.runs}}
+                                            </span>&nbsp;
+                                        {% endif %}
+                                        {{runs.bowler}} to {{runs.batsman}}, got {{runs.runs}} runs
+                                    </h6>
+                                    <small>{{runs.ball_count|intdiv:6}}.{{runs.ball_count|mod:6}}</small>
+                                </div>
+                                {% if runs.comment is not None %}
+                                <p class="mb-1">{{runs.comment}}</p>
+                                {% endif %}
+                            </div>
+                            <br>
+                            {% if runs.ball_count|divisibleby:6 %}
+                                </div>
+                                <div class="list-group">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+    {% endfor %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

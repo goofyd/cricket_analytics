@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{app_name}} Coming Soon!</title>
+    <style>
+        body{
+            margin: 0px;
+            padding: 0px;
+            font-family: 'Arial';
+        }
+        .container {
+            padding: 10px;
+        }
+        #heading {
+            text-align: center;
+        }
+        .navbar{
+            padding-left:15px;
+            display: flex;
+            box-shadow: 0px 0px 0px #ddd;
+            background: #333;
+            color: #ddd;
+        }
+        .nav-heading{
+            flex-grow: 1;
+        }
+        .nav-heading h1{
+            text-shadow: 0px 0px 0px #ddd;
+        }
+        .nav-heading a{
+            color: #ddd;
+            float: right;
+            padding-right: 10px;
+            padding-top: 30px;
+            text-decoration: none;
+        }
+        .nav-heading a:hover{
+            color: #ddd;
+            font-weight: 600;
+            transition: 0.3s ease;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-heading">
+            <h1>{{app_name}}</h1>
+        </div>
+        <div class="nav-heading">
+            <a href="/admin">Login As Admin</a>
+        </div>
+    </div>
+    <div class="container">
+        <div id="heading">
+            <h3>Coming Soon!</h3>
+        </div>
+    </div>
+</body>
+</html>
