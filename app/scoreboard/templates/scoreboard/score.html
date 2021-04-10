@@ -8,71 +8,136 @@
 </head>
 <body>
 {% load mathfilters %}
-<div class="jumbotron">
-  <h1 class="display-6">{{match}}</h1>
-  <div class="row">
-      {% for inning in innings %}
-        <div class="col-6">
-            <div class="card" style="width: 100%;">
-              <div class="card-body">
-                <h5 class="card-title">{{inning.innings.team}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Innings - {{inning.innings.innings_number}}</h6>
-                <h3 class="card-text">{{inning.total}}</h3>
-                <a href="#" class="card-link">Scorecard</a>
+<div class="jumbotron pb-2 pt-2 mb-1 bg-dark text-white" style="border-radius:0px;">
+  <div class="container-fluid">
+      <nav aria-label="breadcrumb" class="bg-dark text-white">
+          <ol class="breadcrumb bg-dark text-white">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">{{match.tournament}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{match}}</li>
+          </ol>
+      </nav>
+      <div class="container">
+          <h2 class="display-6">Match {{match.match_number}} - {{match.tournament}}</h2>
+          <div class="row">
+              {% for inning in innings %}
+                <div class="col-md-6 col-sm-12 mb-2 mt-2">
+                    <div class="card text-dark" style="width: 100%;">
+                      <div class="card-body">
+                        <h5 class="card-title">{{inning.innings.team}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Innings - {{inning.innings.innings_number}}</h6>
+                        <h3 class="card-text">
+                            {{inning.total}} / {{inning.wkts}}
+                            <small class="text-muted">&nbsp;({{inning.overs|intdiv:6}}.{{inning.overs|mod:6}} Overs)</small>
+                        </h3>
+                        <a href="#" class="card-link">Scorecard</a>
+                      </div>
+                    </div>
+                </div>
+              {% endfor %}
+          </div>
+          <div class="text-center mt-2">
+              <div class="text-center">
+                  {% if match.result.team_name is not null %}
+                    <h5>Result</h5>
+                  <strong>{{match.result.team_name}}</strong> won by
+                    {% if match.result.team_name == innings.1.innings.team.team_name %}
+                        {{10|sub:innings.1.wkts}} wickets
+                    {% else %}
+                        {{innings.0.total|sub:innings.1.total}} runs
+                    {% endif %}
+                    <hr>
+                    <Strong>MoM: </Strong>{{match.mom}}, <strong>Venue: </strong>{{match.venue}},
+                    <strong>Played on: </strong>{{match.match_date_time}}
+                  {% else %}
+                    <h5>Result: </h5> Match is in Progress
+                  {% endif %}
               </div>
-            </div>
-        </div>
-      {% endfor %}
+          </div>
+      </div>
   </div>
 </div>
 
 <div class="container">
-    {% for inning in innings %}
-        <div class="card" style="margin-bottom:10px;">
-            <div class="card-body">
-                <div class="card-title">
-                    <h3>Commentry - {{inning.innings.team}}</h3>
-                </div>
-                    <div class="list-group">
-                        {% for runs in inning.runs %}
-                            <div class="list-group-item list-group-item-action flex-column align-items-start">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6>
-                                        {% if runs.action|lower == 'wicket' %}
-                                            <span class="badge badge-danger">
-                                                W
-                                            </span>&nbsp;
-                                        {% elif runs.runs == '6' %}
-                                            <span class="badge badge-warning">
-                                                {{runs.runs}}
-                                            </span>&nbsp;
-                                        {% elif runs.runs == '4' %}
-                                            <span class="badge badge-success">
-                                                {{runs.runs}}
-                                            </span>&nbsp;
-                                        {% else %}
-                                            <span class="badge badge-primary">
-                                                {{runs.runs}}
-                                            </span>&nbsp;
-                                        {% endif %}
-                                        {{runs.bowler}} to {{runs.batsman}}, got {{runs.runs}} runs
-                                    </h6>
-                                    <small>{{runs.ball_count|intdiv:6}}.{{runs.ball_count|mod:6}}</small>
+    <ul class="nav nav-pills nav-fill" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="commentry-tab" data-toggle="tab" href="#commentry" role="tab" aria-controls="commentry" aria-selected="true">Commentry</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="fullcommentry-tab" data-toggle="tab" href="#full_commentry" role="tab" aria-controls="full_commentry" aria-selected="false">Full Commentry</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="commentry" role="tabpanel" aria-labelledby="commentry-tab">
+          Commentry
+      </div>
+      <div class="tab-pane" id="full_commentry" role="tabpanel" aria-labelledby="fullcommentry-tab">
+        {% for inning in innings %}
+            <div class="card mb-5">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h3>Commentry - {{inning.innings.team}}</h3>
+                    </div>
+                        <div class="list-group">
+                            {% for runs in inning.runs %}
+                                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6>
+                                            {% if runs.action|lower == 'wicket' %}
+                                                <span class="badge badge-pill badge-danger">
+                                                    W
+                                                </span>
+                                                {% if 'runout' in runs.comment %}
+                                                    OUT!!! Its a Run Out!!
+                                                {% else %}
+                                                    OUT!!! {{runs.bowler}} takes the wicket of {{runs.batsman}}
+                                                {% endif %}
+                                                {% if runs.runs is not 0 %}
+                                                    , but got {{runs.runs}} runs
+                                                {% endif %}
+                                                &nbsp;
+                                            {% elif runs.runs == '6' %}
+                                                <span class="badge badge-pill badge-warning">
+                                                    {{runs.runs}}
+                                                </span>
+                                                {{runs.batsman}} hits {{runs.bowler}} for a SIX!!!&nbsp;
+                                            {% elif runs.runs == '4' %}
+                                                <span class="badge badge-pill badge-success">
+                                                    {{runs.runs}}
+                                                </span>
+                                                {{runs.batsman}} hits {{runs.bowler}} for a boundary
+                                            {% elif runs.runs == 0 %}
+                                                <span class="badge badge-pill badge-secondary">
+                                                    {{runs.runs}}
+                                                </span>
+                                                {{runs.bowler}} to {{runs.batsman}}, No Run&nbsp;
+                                            {% else %}
+                                                <span class="badge badge-pill badge-primary">
+                                                    {{runs.runs}}
+                                                </span>
+                                                {{runs.bowler}} to {{runs.batsman}}, got {{runs.runs}} runs&nbsp;
+                                            {% endif %}
+                                        </h6>
+                                        <small><strong>{{runs.ball_count|intdiv:6}}.{{runs.ball_count|mod:6}}</strong></small>
+                                    </div>
+                                    {% if runs.comment is not None %}
+                                    <p class="mb-1">{{runs.comment}}</p>
+                                    {% endif %}
                                 </div>
-                                {% if runs.comment is not None %}
-                                <p class="mb-1">{{runs.comment}}</p>
+                                <br>
+                                {% if runs.ball_count|divisibleby:6 %}
+                                    </div>
+                                    <div class="list-group">
                                 {% endif %}
-                            </div>
-                            <br>
-                            {% if runs.ball_count|divisibleby:6 %}
-                                </div>
-                                <div class="list-group">
-                            {% endif %}
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
-    {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
